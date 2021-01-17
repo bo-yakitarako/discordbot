@@ -1,14 +1,6 @@
-import { Client, Message } from 'discord.js';
-import { createConnection, EntityTarget, getRepository, Repository } from 'typeorm';
-
-type Callback<Entity, Res> = (respository: Repository<Entity>) => Promise<Res>;
+import { Client, Guild, GuildMember, Message } from 'discord.js';
 
 abstract class BotBase {
-  /** 必ずonMessageの最初に代入する */
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  protected message: Message;
-
   protected abstract onReady(): void;
   protected abstract onMessage(message: Message): void;
 
@@ -19,13 +11,9 @@ abstract class BotBase {
     client.login(token);
   }
 
-  protected async connect<Entity, Res>(entity: EntityTarget<Entity>, callback: Callback<Entity, Res>) {
-    const connection = await createConnection();
-    const repository = getRepository(entity);
-    const responce = await callback(repository);
-    connection.close();
-    return responce;
+  protected getDisplayName(message: Message) {
+    return ((message.guild as Guild).member(message.author) as GuildMember).displayName;
   }
 }
 
-export { BotBase, Callback };
+export { BotBase };

@@ -1,5 +1,6 @@
 import { Message } from 'discord.js';
 import { GoodRate } from '../entity/GoodRate';
+import { connect } from '../utility';
 import { BotBase } from './BotBase';
 
 class GoodBot extends BotBase {
@@ -18,89 +19,88 @@ class GoodBot extends BotBase {
     if (message.author.bot) {
       return;
     }
-    this.message = message;
     if (message.content.startsWith('!setrate')) {
-      this.setRate();
+      this.setRate(message);
     } else if (message.content === '!showrate') {
-      this.showRate();
+      this.showRate(message);
     } else if (message.content === '!gacha' && !this.doingGacha) {
-      this.sellSoul();
+      this.sellSoul(message);
     } else {
-      this.sendGood();
+      this.sendGood(message);
     }
   }
 
-  private async sendGood() {
+  private async sendGood(message: Message) {
     const rate = await this.getRate();
     if (Math.random() < rate) {
-      const emoji = this.getEmoji();
+      const emoji = this.getEmoji(message);
       if (emoji) {
-        this.message.channel.send(emoji.toString());
+        message.channel.send(emoji.toString());
       }
     }
   }
 
-  private async showRate() {
+  private async showRate(message: Message) {
     const rate = await this.getRate();
     const fixedRate = (rate * 100).toFixed(1);
-    this.message.channel.send(`今の確率は「${fixedRate}%」だよ`);
+    message.channel.send(`今の確率は「${fixedRate}%」だよ`);
   }
 
   private async getRate() {
-    return this.connect(GoodRate, async (repository) => {
+    return connect(GoodRate, async (repository) => {
       const { rate } = (await repository.findOne({ id: 1 })) as GoodRate;
       return rate;
     });
   }
 
-  private async setRate() {
-    this.connect(GoodRate, async (repository) => {
+  private async setRate(message: Message) {
+    connect(GoodRate, async (repository) => {
       try {
-        const rate = parseFloat(this.message.content.split(' ')[1]);
+        const rate = parseFloat(message.content.split(' ')[1]);
         if (Number.isNaN(rate)) {
-          this.message.channel.send('数字じゃないとわかんないね');
+          message.channel.send('数字じゃないとわかんないね');
           return;
         }
         if (rate < 0 || rate > 100) {
-          this.message.channel.send('0から100までの数字にしてほしいなー');
+          message.channel.send('0から100までの数字にしてほしいなー');
           return;
         }
         const goodRate = (await repository.findOne({ id: 1 })) as GoodRate;
         goodRate.rate = rate / 100;
         await repository.save(goodRate);
-        this.message.channel.send(`いいね確率を「${rate}%」にできていいね`);
+        message.channel.send(`いいね確率を「${rate}%」にできていいね`);
       } catch {
-        this.message.channel.send('確率指定してなくない？');
+        message.channel.send('確率指定してなくない？');
       }
     });
   }
 
-  private async sellSoul(rate?: number, count = 0) {
+  private async sellSoul(message: Message, rate?: number, count = 0) {
     if (count >= 10) {
       this.doingGacha = false;
       return;
     }
     if (typeof rate === 'undefined') {
-      this.message.channel.send('てーてれってってー');
+      message.channel.send('てーてれってってー');
       // eslint-disable-next-line no-param-reassign
       rate = await this.getRate();
       this.doingGacha = true;
     }
     await new Promise<void>((resolve) => setTimeout(() => resolve(), 500));
-    const emoji = this.getEmoji();
+    const emoji = this.getEmoji(message);
     if (Math.random() < rate) {
-      await this.message.channel.send(emoji ? emoji.toString() : 'いいね');
+      await message.channel.send(emoji ? emoji.toString() : 'いいね');
     } else {
-      await this.message.channel.send('よくない');
+      await message.channel.send('よくない');
     }
-    this.sellSoul(rate, count + 1);
+    this.sellSoul(message, rate, count + 1);
   }
 
-  private getEmoji() {
-    if (!this.message.guild) {
+  private getEmoji(message: Message) {
+    if (!message.guild) {
       return undefined;
     }
-    return this.message.guild.emojis.cache.find(({ name }) => name === 'iine');
+    return message.guild.emojis.cache.find(({ name }) => name === 'iine');
   }
 }
 

@@ -1,7 +1,7 @@
 import { config } from 'dotenv';
-import { GoodBot } from './bots/GoodBot';
+import { OmikujiBot } from './bots/OmikujiBot';
 
 config();
 const TEST_TOKEN = process.env.TEST_TOKEN as string;
-const test = new GoodBot();
+const test = new OmikujiBot();
 test.launch(TEST_TOKEN);

@@ -1,13 +1,13 @@
 import { config } from 'dotenv';
-import { Omikuji } from './bots/Omikuji';
+import { OmikujiBot } from './bots/OmikujiBot';
 import { SparebeatGradeCertification } from './bots/SparebeatGradeCertification';
 import { GoodBot } from './bots/GoodBot';
 import 'reflect-metadata';
 
 config();
-const TOKEN = process.env.OMIKUJI_TOKEN as string;
-const omikuji = new Omikuji();
-omikuji.launch(TOKEN);
+const OMIKUJI_TOKEN = process.env.OMIKUJI_TOKEN as string;
+const omikuji = new OmikujiBot();
+omikuji.launch(OMIKUJI_TOKEN);
 
 const SGC_TOKEN = process.env.SGC_TOKEN as string;
 const sgc = new SparebeatGradeCertification();
