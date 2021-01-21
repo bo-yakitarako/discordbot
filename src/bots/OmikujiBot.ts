@@ -70,7 +70,7 @@ class OmikujiBot extends BotBase {
       const { updatedAt } = (await repository.findOne({ id: 1 })) as BoResult;
       return dayjs(updatedAt).format(DATE_FORMAT) === dayjs().format(DATE_FORMAT);
     });
-    if (!isBoAlreadyDraw) {
+    if (isBoAlreadyDraw) {
       await message.channel.send(await this.getBotComment(message, fortune));
     }
   }
