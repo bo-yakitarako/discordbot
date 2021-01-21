@@ -1,5 +1,6 @@
 import { Client, Guild, TextChannel } from 'discord.js';
 import { config } from 'dotenv';
+import { getConnection } from 'typeorm';
 import { getFortune, sendResult } from './bots/OmikujiBot';
 import { BoResult } from './entity/BoResult';
 import { Omikuji } from './entity/Omikuji';
@@ -16,14 +17,28 @@ client.on('ready', () => onReady());
 
 const onReady = async () => {
   const fortune = getFortune();
-  const boResult = (await connect(Omikuji, (repository) => repository.findOne({ userId }))) as Omikuji;
-  boResult[fortune] += 1;
-  await connect(Omikuji, (repository) => repository.save(boResult));
-  await connect(BoResult, (repository) => repository.save({ id: 1, result: fortune }));
+  await connect(Omikuji, (repository) => repository.increment({ userId }, fortune, 1));
+  const { result } = (await connect(BoResult, (repository) =>
+    repository.findOne({ id: 1 })
+  )) as BoResult;
+  if (result === fortune) {
+    await updateTime();
+  } else {
+    await connect(BoResult, async (repository) => repository.save({ id: 1, result: fortune }));
+  }
   const guild = client.guilds.cache.find(({ id }) => id === MARUOKUN_ID) as Guild;
   const channel = guild.channels.cache.find(({ id }) => id === CHANNEL_ID) as TextChannel;
   await sendResult(channel, fortune);
   client.destroy();
 };
+
+async function updateTime() {
+  await getConnection()
+    .createQueryBuilder()
+    .update(BoResult)
+    .set({ updatedAt: 'NOW()' })
+    .where('id = 1')
+    .execute();
+}
 
 client.login(OMIKUJI_TOKEN);

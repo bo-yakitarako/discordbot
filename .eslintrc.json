@@ -34,6 +34,9 @@
             "tsx": "never"
         }],
         "complexity": ["error", 11],
+        "max-len": ["error", {
+            "code": 100
+        }],
         "camelcase": "off",
         "class-methods-use-this": "off",
         "lines-between-class-members": "off",
@@ -72,7 +75,7 @@
         "prettier/prettier": [
             "error",
             {
-                "printWidth": 120,
+                "printWidth": 100,
                 "tabWidth": 2,
                 "trailingComma": "all",
                 "bracketSpacing": true,

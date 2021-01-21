@@ -8,7 +8,8 @@ const axios = axiosBase.create({
   baseURL: 'https://beta.sparebeat.com',
   headers: {
     'Content-Type': 'application/json', // eslint-disable-line @typescript-eslint/naming-convention
-    'X-Requested-With': 'XMLHttpRequest', // eslint-disable-line @typescript-eslint/naming-convention
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    'X-Requested-With': 'XMLHttpRequest',
   },
   responseType: 'json',
 });
@@ -37,18 +38,28 @@ class ScoreAttackBot extends BotBase {
     }
     const sparebeatDisplayName = await this.getSparebeatDisplayName(sparebeatName);
     if (typeof sparebeatDisplayName === 'undefined') {
-      await message.channel.send(`${reply} 「${sparebeatName}」というユーザーはSparebeatに登録されていないようです！`);
-      return;
-    }
-    const registeredName = await this.getDiscordDisplayNameFromSparebeatName(message, sparebeatName);
-    if (typeof registeredName !== 'undefined') {
       await message.channel.send(
-        `${reply} Sparebeatユーザー「${sparebeatDisplayName}」は既にこの鯖にいる${registeredName}さんと連携されてるので新しく紐付けることはできません！`,
+        `${reply} 「${sparebeatName}」というユーザーはSparebeatに登録されていないようです！`,
       );
       return;
     }
-    await connect(ScoreAttackUsers, async (repository) => repository.save({ discordId, sparebeatName }));
-    await message.channel.send(`${reply} Sparebeatアカウント「${sparebeatDisplayName}」と連携しました！`);
+    const registeredName = await this.getDiscordDisplayNameFromSparebeatName(
+      message,
+      sparebeatName,
+    );
+    if (typeof registeredName !== 'undefined') {
+      await message.channel.send(
+        `${reply} Sparebeatユーザー「${sparebeatDisplayName}」は
+        既にこの鯖にいる${registeredName}さんと連携されてるので新しく紐付けることはできません！`,
+      );
+      return;
+    }
+    await connect(ScoreAttackUsers, async (repository) =>
+      repository.save({ discordId, sparebeatName }),
+    );
+    await message.channel.send(
+      `${reply} Sparebeatアカウント「${sparebeatDisplayName}」と連携しました！`,
+    );
   }
 
   private async getSparebeatDisplayName(sparebeatName: string) {
@@ -61,7 +72,9 @@ class ScoreAttackBot extends BotBase {
   }
 
   private async getDiscordDisplayNameFromSparebeatName(message: Message, sparebeatName: string) {
-    const usersInDB = await connect(ScoreAttackUsers, async (repository) => repository.find({ sparebeatName }));
+    const usersInDB = await connect(ScoreAttackUsers, async (repository) =>
+      repository.find({ sparebeatName }),
+    );
     if (typeof usersInDB === 'undefined') {
       return undefined;
     }

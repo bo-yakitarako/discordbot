@@ -115,7 +115,9 @@ class OmikujiBot extends BotBase {
   }
 
   private async getResult(message: Message) {
-    return connect(Omikuji, async (repository) => repository.findOne({ userId: message.author.id }));
+    return connect(Omikuji, async (repository) =>
+      repository.findOne({ userId: message.author.id }),
+    );
   }
 }
 

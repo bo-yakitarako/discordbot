@@ -143,7 +143,9 @@ class SparebeatGradeCertification extends Bot {
     const unavailableRoles = this.checkUnavailableGradeRole(roleList);
     if (unavailableRoles.length > 0) {
       message.channel.send(
-        `${unavailableRoles.map((roleName) => `「**${roleName}**」`).join('と')}の役職がないよう><\n` +
+        `${unavailableRoles
+          .map((roleName) => `「**${roleName}**」`)
+          .join('と')}の役職がないよう><\n` +
           '```!create roles```のコマンドで無いやつを作っちゃいます',
       );
       return;
@@ -216,7 +218,9 @@ class SparebeatGradeCertification extends Bot {
       });
     });
     message.channel.send(
-      `${unavailableRoles.map((roleName) => `「**${roleName}**」`).join('と')}の役職を作成しました！`,
+      `${unavailableRoles
+        .map((roleName) => `「**${roleName}**」`)
+        .join('と')}の役職を作成しました！`,
     );
   }
 
@@ -229,6 +233,7 @@ class SparebeatGradeCertification extends Bot {
           url: 'https://sgc.bo-yakitarako.com/sgc.png',
         },
         description:
+          // eslint-disable-next-line max-len
           '**!gradehelp link**\n段位認定との連携方法に関するヘルプを表示します\n[認証ページはここから](https://discord.com/api/oauth2/authorize?client_id=718706299826864139&redirect_uri=https%3A%2F%2Fsgc.bo-yakitarako.com%2Fdiscord%2Fauthorize&response_type=code&scope=identify)\n\n' +
           '**!gradehelp id**\n段位IDと各段位との照合です\n\n' +
           '**!status <段位ID>**\n指定した段位IDの現状を表示します\n初段の例) ``!status grade1``\n\n' +
@@ -247,6 +252,7 @@ class SparebeatGradeCertification extends Bot {
           url: 'https://sgc.bo-yakitarako.com/sgc.png',
         },
         description:
+          // eslint-disable-next-line max-len
           '1. [Discord認証ページ](https://discord.com/api/oauth2/authorize?client_id=718706299826864139&redirect_uri=https%3A%2F%2Fsgc.bo-yakitarako.com%2Fdiscord%2Fauthorize&response_type=code&scope=identify)からDiscordのアカウントを認証する\n\n' +
           '2. Twitterの認証が済んでいない場合はTwitterの認証に飛ぶのでTwitterでも認証する\n\n' +
           '3. 左側にDiscordアカウントのアイコン、右側にTwitterアカウントのアイコンが表示されているページが表示されれば連携完了！\n\n' +
