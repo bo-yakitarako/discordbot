@@ -15,7 +15,7 @@ const register = async (message: Message) => {
   const sparebeatDisplayName = await getSparebeatDisplayName(sparebeatName);
   if (typeof sparebeatDisplayName === 'undefined') {
     await message.channel.send(
-      `${mention} 「${sparebeatName}」というユーザーはSparebeatに登録されていないようです！`,
+      `${mention} 「${sparebeatName}」というアカウントはSparebeatに登録されていないようです！`,
     );
     return;
   }
