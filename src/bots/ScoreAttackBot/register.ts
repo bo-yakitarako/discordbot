@@ -7,31 +7,37 @@ import { SparebeatProfile } from './types';
 const register = async (message: Message) => {
   const sparebeatName = message.content.split(' ')[1];
   const discordId = message.author.id;
-  const reply = `<@!${discordId}>`;
+  const mention = `<@!${discordId}>`;
   if (!sparebeatName) {
-    await message.channel.send(`${reply} よくわかんないよー><`);
+    await message.channel.send(`${mention} よくわかんないよー><`);
     return;
   }
   const sparebeatDisplayName = await getSparebeatDisplayName(sparebeatName);
   if (typeof sparebeatDisplayName === 'undefined') {
     await message.channel.send(
-      `${reply} 「${sparebeatName}」というユーザーはSparebeatに登録されていないようです！`,
+      `${mention} 「${sparebeatName}」というユーザーはSparebeatに登録されていないようです！`,
     );
     return;
   }
   const registeredName = await getDiscordDisplayNameFromSparebeatName(message, sparebeatName);
   if (typeof registeredName !== 'undefined') {
     await message.channel.send(
-      `${reply} Sparebeatユーザー「${sparebeatDisplayName}」は
-        既にこの鯖にいる${registeredName}さんと連携されてるので新しく紐付けることはできません！`,
+      // eslint-disable-next-line max-len
+      `${mention} Sparebeatアカウント「${sparebeatDisplayName}」は既にこの鯖にいる${registeredName}さんと連携されてるので新しく紐付けることはできません！`,
     );
     return;
   }
-  await connect(ScoreAttackUsers, async (repository) =>
-    repository.save({ discordId, sparebeatName }),
+  const userInDB = await connect(ScoreAttackUsers, (repository) =>
+    repository.findOne({ discordId }),
   );
+  if (typeof userInDB === 'undefined') {
+    await connect(ScoreAttackUsers, (repository) => repository.save({ discordId, sparebeatName }));
+  } else {
+    userInDB.sparebeatName = sparebeatName;
+    await connect(ScoreAttackUsers, (repository) => repository.save(userInDB));
+  }
   await message.channel.send(
-    `${reply} Sparebeatアカウント「${sparebeatDisplayName}」と連携しました！`,
+    `${mention} Sparebeatアカウント「${sparebeatDisplayName}」と連携しました！`,
   );
 };
 
@@ -53,7 +59,9 @@ const getDiscordDisplayNameFromSparebeatName = async (message: Message, sparebea
   }
   const guild = message.guild as Guild;
   const userInDB = usersInDB.find(
-    ({ discordId }) => guild.members.cache.find(({ id }) => id === discordId) !== undefined,
+    ({ discordId }) =>
+      typeof guild.members.cache.find(({ id }) => id === discordId && id !== message.author.id) !==
+      'undefined',
   );
   if (typeof userInDB === 'undefined') {
     return undefined;
@@ -62,4 +70,18 @@ const getDiscordDisplayNameFromSparebeatName = async (message: Message, sparebea
   return member.displayName;
 };
 
-export { register, getSparebeatDisplayName };
+const unregister = async (message: Message) => {
+  const discordId = message.author.id;
+  const userInDB = await connect(ScoreAttackUsers, (repository) =>
+    repository.findOne({ discordId }),
+  );
+  const mention = `<@!${discordId}>`;
+  if (typeof userInDB === 'undefined') {
+    await message.channel.send(`${mention} あんた連携してねえべさ？`);
+    return;
+  }
+  await connect(ScoreAttackUsers, (repository) => repository.remove(userInDB));
+  await message.channel.send(`${mention} Sparebeatとの連携を解除したよ`);
+};
+
+export { register, unregister, getSparebeatDisplayName };

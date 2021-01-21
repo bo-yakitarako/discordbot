@@ -1,11 +1,11 @@
 import { Message } from 'discord.js';
 import axiosBase from 'axios';
 import { BotBase } from '../BotBase';
-import { register } from './register';
+import { register, unregister } from './register';
 
 class ScoreAttackBot extends BotBase {
   protected onReady() {
-    console.log('すこあた起動マン');
+    console.log('すこあたきどうマン');
   }
 
   protected onMessage(message: Message) {
@@ -14,6 +14,8 @@ class ScoreAttackBot extends BotBase {
     }
     if (message.content.startsWith('!register')) {
       register(message);
+    } else if (message.content === '!unregister') {
+      unregister(message);
     }
   }
 }
