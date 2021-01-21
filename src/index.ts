@@ -1,8 +1,8 @@
 import { config } from 'dotenv';
+import 'reflect-metadata';
 import { OmikujiBot } from './bots/OmikujiBot';
 import { SparebeatGradeCertification } from './bots/SparebeatGradeCertification';
 import { GoodBot } from './bots/GoodBot';
-import 'reflect-metadata';
 
 config();
 const OMIKUJI_TOKEN = process.env.OMIKUJI_TOKEN as string;
