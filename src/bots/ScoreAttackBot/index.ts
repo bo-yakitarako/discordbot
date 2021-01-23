@@ -1,11 +1,14 @@
-import { Message } from 'discord.js';
+import { Guild, Message } from 'discord.js';
 import axiosBase from 'axios';
 import { BotBase } from '../BotBase';
 import { register, unregister } from './register';
+import { getDescription, setSong } from './songSelect';
+import { connect } from '../../utility';
+import { ScoreAttackSongs } from '../../entity/ScoreAttackSongs';
 
 class ScoreAttackBot extends BotBase {
   protected onReady() {
-    console.log('すこあたきどうマン');
+    console.log('すこあたってますか！？');
   }
 
   protected onMessage(message: Message) {
@@ -16,6 +19,41 @@ class ScoreAttackBot extends BotBase {
       register(message);
     } else if (message.content === '!unregister') {
       unregister(message);
+    } else if (message.content.startsWith('!set')) {
+      setSong(message);
+    } else if (message.content === '!current') {
+      this.sendCurrent(message);
+    } else if (message.content === '!finish') {
+      this.finish(message);
+    }
+  }
+
+  private async sendCurrent(message: Message) {
+    const guildId = (message.guild as Guild).id;
+    const data = await connect(ScoreAttackSongs, (repository) => repository.findOne({ guildId }));
+    if (typeof data === 'undefined') {
+      await message.channel.send('今は何も設定されていないよ');
+      return;
+    }
+    await message.channel.send({
+      embed: {
+        author: {
+          name: '現在設定されている曲',
+        },
+        title: data.title,
+        url: data.url,
+        color: 0xce9eff,
+        description: getDescription(data),
+      },
+    });
+  }
+
+  private async finish(message: Message) {
+    const guildId = (message.guild as Guild).id;
+    const data = await connect(ScoreAttackSongs, (repository) => repository.findOne({ guildId }));
+    if (typeof data !== 'undefined') {
+      await connect(ScoreAttackSongs, (repository) => repository.remove(data));
+      await message.channel.send('みんなおつかれー');
     }
   }
 }
