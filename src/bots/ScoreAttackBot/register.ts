@@ -1,4 +1,4 @@
-import { Guild, GuildMember, Message } from 'discord.js';
+import { Message } from 'discord.js';
 import { axios } from '.';
 import { ScoreAttackUsers } from '../../entity/ScoreAttackUsers';
 import { connect } from '../../utility';
@@ -19,11 +19,13 @@ const register = async (message: Message) => {
     );
     return;
   }
-  const registeredName = await getDiscordDisplayNameFromSparebeatName(message, sparebeatName);
-  if (typeof registeredName !== 'undefined') {
+  const usersInDB = await connect(ScoreAttackUsers, async (repository) =>
+    repository.findOne({ sparebeatName }),
+  );
+  if (typeof usersInDB !== 'undefined') {
     await message.channel.send(
       // eslint-disable-next-line max-len
-      `${mention} Sparebeatアカウント「${sparebeatDisplayName}」は既にこの鯖にいる${registeredName}さんと連携されてるので新しく紐付けることはできません！`,
+      `${mention} Sparebeatアカウント「${sparebeatDisplayName}」は既に連携されてるので新しく紐付けることはできません！`,
     );
     return;
   }
@@ -48,26 +50,6 @@ const getSparebeatDisplayName = async (sparebeatName: string) => {
   } catch {
     return undefined;
   }
-};
-
-const getDiscordDisplayNameFromSparebeatName = async (message: Message, sparebeatName: string) => {
-  const usersInDB = await connect(ScoreAttackUsers, async (repository) =>
-    repository.find({ sparebeatName }),
-  );
-  if (typeof usersInDB === 'undefined') {
-    return undefined;
-  }
-  const guild = message.guild as Guild;
-  const userInDB = usersInDB.find(
-    ({ discordId }) =>
-      typeof guild.members.cache.find(({ id }) => id === discordId && id !== message.author.id) !==
-      'undefined',
-  );
-  if (typeof userInDB === 'undefined') {
-    return undefined;
-  }
-  const member = guild.members.cache.find(({ id }) => id === userInDB.discordId) as GuildMember;
-  return member.displayName;
 };
 
 const unregister = async (message: Message) => {
