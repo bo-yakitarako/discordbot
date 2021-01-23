@@ -5,10 +5,11 @@ import { register, unregister } from './register';
 import { getDescription, setSong } from './songSelect';
 import { connect } from '../../utility';
 import { ScoreAttackSongs } from '../../entity/ScoreAttackSongs';
+import { scoring } from './scoring';
 
 class ScoreAttackBot extends BotBase {
   protected onReady() {
-    console.log('すこあたってますか！？');
+    console.log('すこあたってしまうのですか！！？？');
   }
 
   protected onMessage(message: Message) {
@@ -25,6 +26,8 @@ class ScoreAttackBot extends BotBase {
       this.sendCurrent(message);
     } else if (message.content === '!finish') {
       this.finish(message);
+    } else if (message.content === '!score') {
+      scoring(message);
     }
   }
 

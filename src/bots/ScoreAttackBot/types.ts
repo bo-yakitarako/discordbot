@@ -7,14 +7,14 @@ type SparebeatProfile = {
 };
 
 type Track = {
-  id: string;
   title: string;
   artist: string;
+  url: string | null;
   bpm: number;
   levelEasy: number;
   levelNormal: number;
   levelHard: number;
-  url: string | null;
+  id: string;
 };
 
 type Tracks = {
@@ -41,4 +41,24 @@ type SongTable = {
   level: number;
 };
 
-export { SparebeatProfile, Track, Tracks, PlayAPI, SongTable };
+type PlayRecord = {
+  difficulty: 1 | 2 | 3;
+  layout: number;
+  bind: boolean;
+  score: number;
+  chain: number;
+  just: number;
+  early: number;
+  late: number;
+  miss: number;
+  attack: number;
+  createdAt: string;
+  track: Track;
+};
+
+type ScoreInfo = {
+  score: number;
+  scoreCreatedAt: string;
+};
+
+export { SparebeatProfile, Track, Tracks, PlayAPI, SongTable, PlayRecord, ScoreInfo };
