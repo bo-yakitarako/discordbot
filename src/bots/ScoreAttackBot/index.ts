@@ -6,6 +6,7 @@ import { getDescription, setSong } from './songSelect';
 import { connect } from '../../utility';
 import { ScoreAttackSongs } from '../../entity/ScoreAttackSongs';
 import { scoring } from './scoring';
+import { showRanking } from './ranking';
 
 class ScoreAttackBot extends BotBase {
   protected onReady() {
@@ -28,6 +29,8 @@ class ScoreAttackBot extends BotBase {
       this.finish(message);
     } else if (message.content === '!score') {
       scoring(message);
+    } else if (message.content.startsWith('!ranking')) {
+      showRanking(message);
     }
   }
 
