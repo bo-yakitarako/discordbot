@@ -1,5 +1,13 @@
 import { config } from 'dotenv';
-import { createConnection, EntityTarget, getRepository, Repository } from 'typeorm';
+import {
+  createConnection,
+  EntityTarget,
+  FindConditions,
+  FindManyOptions,
+  FindOneOptions,
+  getRepository,
+  Repository,
+} from 'typeorm';
 
 type Callback<Entity, Res> = (respository: Repository<Entity>) => Promise<Res>;
 
@@ -17,4 +25,45 @@ async function connect<Entity, Res>(entity: EntityTarget<Entity>, callback: Call
   return responce;
 }
 
-export { isDevelopment, connect };
+function find<Entity>(
+  entity: EntityTarget<Entity>,
+  option: FindOneOptions<Entity>,
+): Promise<Entity[]>;
+
+function find<Entity>(
+  entity: EntityTarget<Entity>,
+  option: FindManyOptions<Entity>,
+): Promise<Entity[]>;
+
+function find<Entity>(
+  entity: EntityTarget<Entity>,
+  conditions: FindConditions<Entity>,
+): Promise<Entity[]>;
+
+async function find<Entity>(
+  entity: EntityTarget<Entity>,
+  option: FindOneOptions<Entity> | FindManyOptions<Entity> | FindConditions<Entity>,
+) {
+  return connect(entity, (repository) => repository.find(option));
+}
+
+function findOne<Entity>(
+  entity: EntityTarget<Entity>,
+  conditions?: FindConditions<Entity>,
+): Promise<Entity | undefined>;
+
+function findOne<Entity>(
+  entity: EntityTarget<Entity>,
+  conditions?: FindConditions<Entity>,
+  option?: FindOneOptions<Entity>,
+): Promise<Entity | undefined>;
+
+async function findOne<Entity>(
+  entity: EntityTarget<Entity>,
+  conditions?: FindConditions<Entity>,
+  option?: FindOneOptions<Entity>,
+) {
+  return connect(entity, (repository) => repository.findOne(conditions, option));
+}
+
+export { isDevelopment, connect, find, findOne };
