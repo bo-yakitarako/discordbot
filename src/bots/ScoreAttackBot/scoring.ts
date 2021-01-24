@@ -39,9 +39,9 @@ const scoring = async (message: Message) => {
     );
     return;
   }
-  if (dayjs(scoreInfo.scoreCreatedAt).isBefore(dayjs().subtract(1, 'minute'))) {
+  if (dayjs(scoreInfo.scoreCreatedAt).isBefore(dayjs().subtract(3, 'minute'))) {
     await message.channel.send(
-      `<@!${discordId}> タイムラインに投稿してから1分以内のやつじゃないとだめだー`,
+      `<@!${discordId}> タイムラインに投稿してから3分以内のやつじゃないとだめだー`,
     );
     return;
   }
@@ -53,11 +53,13 @@ const scoring = async (message: Message) => {
       await message.channel.send(`<@!${discordId}> 何回も\`!score\`するのはやめようね！`);
       return;
     }
-    scoreInHistories.score = scoreInfo.score;
-    scoreInHistories.scoreCreatedAt = scoreInfo.scoreCreatedAt;
-    await connect(ScoreAttackHistories, (repository) => repository.save(scoreInHistories));
-    await sendScoreMessage(message, current, scoreInfo);
-    return;
+    if (scoreInHistories.hash === current.hash) {
+      scoreInHistories.score = scoreInfo.score;
+      scoreInHistories.scoreCreatedAt = scoreInfo.scoreCreatedAt;
+      await connect(ScoreAttackHistories, (repository) => repository.save(scoreInHistories));
+      await sendScoreMessage(message, current, scoreInfo);
+      return;
+    }
   }
   await insert(message, current, scoreInfo);
 };
