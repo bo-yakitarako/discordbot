@@ -7,11 +7,11 @@ import { Omikuji } from './entity/Omikuji';
 import { connect } from './utility';
 
 config();
-const OMIKUJI_TOKEN = process.env.TEST_TOKEN as string;
+const OMIKUJI_TOKEN = process.env.OMIKUJI_ID as string;
 const MARUOKUN_ID = process.env.MARUOKUN_ID as string;
 const CHANNEL_ID = process.env.MAIN_CHANNEL_ID as string;
 const userId = '718705193373532160';
-const id = 2;
+const id = 1;
 
 const client = new Client();
 client.on('ready', () => onReady());
