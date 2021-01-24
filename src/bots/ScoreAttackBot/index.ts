@@ -7,6 +7,7 @@ import { connect } from '../../utility';
 import { ScoreAttackSongs } from '../../entity/ScoreAttackSongs';
 import { scoring } from './scoring';
 import { showRanking } from './ranking';
+import { mainHelp, setHelp } from './help';
 
 class ScoreAttackBot extends BotBase {
   protected onReady() {
@@ -21,6 +22,8 @@ class ScoreAttackBot extends BotBase {
       register(message);
     } else if (message.content === '!unregister') {
       unregister(message);
+    } else if (message.content === '!sethelp') {
+      message.channel.send({ embed: setHelp });
     } else if (message.content.startsWith('!set')) {
       setSong(message);
     } else if (message.content === '!current') {
@@ -31,6 +34,8 @@ class ScoreAttackBot extends BotBase {
       scoring(message);
     } else if (message.content.startsWith('!ranking')) {
       showRanking(message);
+    } else if (message.content === '!attackhelp') {
+      message.channel.send({ embed: mainHelp });
     }
   }
 
