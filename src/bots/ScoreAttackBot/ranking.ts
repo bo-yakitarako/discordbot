@@ -1,22 +1,16 @@
 import { Guild, Message } from 'discord.js';
-import { Raw } from 'typeorm';
 import { ScoreAttackHistories } from '../../entity/ScoreAttackHistories';
-import { connect, find } from '../../utility';
-import { RankingElement } from './types';
+import { connect } from '../../utility';
 
 const showRanking = async (message: Message) => {
   const beforeHour = findBeforeHour(message);
-  const discordIds = await connect(ScoreAttackHistories, async (repository) => {
-    const discordIdsInDB = await repository
-      .createQueryBuilder()
-      .select('"discordId"')
-      .distinct(true)
-      .where(`"guildId" = '${(message.guild as Guild).id}'`)
-      .andWhere(`NOW() - INTERVAL '${beforeHour} HOUR' < "createdAt"`)
-      .getRawMany<{ discordId: string }>();
-    return discordIdsInDB.map(({ discordId }) => discordId);
-  });
-  const rankingElements = await parseRankingElements(message, discordIds, beforeHour);
+  const queryResult = await query(message, beforeHour);
+  const rankingElements = await Promise.all(
+    queryResult.map(async ({ score, discordId }) => ({
+      score,
+      memberName: await getName(message, discordId),
+    })),
+  );
   const fields = rankingElements.map(({ score, memberName }, index) => ({
     name: `${index + 1}位: ${memberName}`,
     value: `合計: ${score}`,
@@ -35,26 +29,29 @@ const findBeforeHour = (message: Message) => {
   return Number.isNaN(hour) ? 6 : hour;
 };
 
-const parseRankingElements = async (message: Message, discordIds: string[], beforeHour: number) => {
-  const members = (message.guild as Guild).members.cache;
-  const scores = [] as RankingElement[];
-  // eslint-disable-next-line no-restricted-syntax
-  for (const discordId of discordIds) {
-    // eslint-disable-next-line no-await-in-loop
-    const score = await calcUserScoreSum(discordId, beforeHour);
-    const memberName =
-      members.find(({ id }) => id === discordId)?.displayName || '今は亡き戦友[ライバル]';
-    scores.push({ score, memberName });
-  }
-  return scores.sort((a, b) => b.score - a.score);
-};
+const query = async (message: Message, beforeHour: number) =>
+  connect(ScoreAttackHistories, (repository) =>
+    repository
+      .createQueryBuilder('histories')
+      .select('"discordId", SUM("score") as score')
+      .where(`"guildId" = '${(message.guild as Guild).id}'`)
+      .andWhere(`NOW() - INTERVAL '${beforeHour} HOUR' < "createdAt"`)
+      .groupBy('"discordId"')
+      .orderBy('score', 'DESC')
+      .getRawMany<{ discordId: string; score: string }>(),
+  );
 
-const calcUserScoreSum = async (discordId: string, beforeHour: number) => {
-  const histories = await find(ScoreAttackHistories, {
-    discordId,
-    createdAt: Raw((alias) => `NOW() - INTERVAL '${beforeHour} HOUR' < ${alias}`),
-  });
-  return histories.reduce((pre, { score }) => pre + score, 0);
+const getName = async (message: Message, discordId: string) => {
+  const member = (message.guild as Guild).members.cache.find(({ id }) => id === discordId);
+  if (typeof member !== 'undefined') {
+    return member.displayName;
+  }
+  try {
+    const user = await message.client.users.fetch(discordId);
+    return user.username;
+  } catch {
+    return '今は亡き戦友[ライバル]';
+  }
 };
 
 export { showRanking };

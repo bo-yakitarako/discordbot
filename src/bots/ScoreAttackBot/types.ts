@@ -61,18 +61,4 @@ type ScoreInfo = {
   scoreCreatedAt: string;
 };
 
-type RankingElement = {
-  memberName: string;
-  score: number;
-};
-
-export {
-  SparebeatProfile,
-  Track,
-  Tracks,
-  PlayAPI,
-  SongTable,
-  PlayRecord,
-  ScoreInfo,
-  RankingElement,
-};
+export { SparebeatProfile, Track, Tracks, PlayAPI, SongTable, PlayRecord, ScoreInfo };
