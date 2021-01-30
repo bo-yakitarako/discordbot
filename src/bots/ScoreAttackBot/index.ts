@@ -18,13 +18,13 @@ class ScoreAttackBot extends BotBase {
     if (message.author.bot) {
       return;
     }
-    if (message.content.startsWith('!register')) {
+    if (message.content.startsWith('!register ')) {
       register(message);
     } else if (message.content === '!unregister') {
       unregister(message);
     } else if (message.content === '!sethelp') {
       message.channel.send({ embed: setHelp });
-    } else if (message.content.startsWith('!set')) {
+    } else if (message.content.startsWith('!set ')) {
       setSong(message);
     } else if (message.content === '!current') {
       this.sendCurrent(message);
