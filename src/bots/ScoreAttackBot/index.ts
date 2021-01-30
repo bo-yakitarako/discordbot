@@ -8,12 +8,14 @@ import { ScoreAttackSongs } from '../../entity/ScoreAttackSongs';
 import { scoring } from './scoring';
 import { showRanking } from './ranking';
 import { mainHelp, setHelp } from './help';
+import { showLog } from './log';
 
 class ScoreAttackBot extends BotBase {
   protected onReady() {
     console.log('すこあたってしまうのですか！！？？');
   }
 
+  // eslint-disable-next-line complexity
   protected onMessage(message: Message) {
     if (message.author.bot) {
       return;
@@ -34,6 +36,8 @@ class ScoreAttackBot extends BotBase {
       scoring(message);
     } else if (message.content.startsWith('!ranking')) {
       showRanking(message);
+    } else if (message.content.startsWith('!log')) {
+      showLog(message);
     } else if (message.content === '!attackhelp') {
       message.channel.send({ embed: mainHelp });
     }

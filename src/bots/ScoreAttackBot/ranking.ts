@@ -41,7 +41,8 @@ const query = async (message: Message, beforeHour: number) =>
       .getRawMany<{ discordId: string; score: string }>(),
   );
 
-const getName = async (message: Message, discordId: string) => {
+const getName = async (message: Message, id?: string) => {
+  const discordId = id || message.author.id;
   const member = (message.guild as Guild).members.cache.find(({ id }) => id === discordId);
   if (typeof member !== 'undefined') {
     return member.displayName;
@@ -54,4 +55,4 @@ const getName = async (message: Message, discordId: string) => {
   }
 };
 
-export { showRanking };
+export { showRanking, getName };
