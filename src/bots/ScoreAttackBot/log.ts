@@ -16,9 +16,9 @@ const showLog = async (message: Message) => {
     await message.channel.send(`<@!${discordId}> 今日はなにもやってないよ`);
     return;
   }
-  const fields = datas.slice(datas.length - 25).map((data, index) => {
-    const name = `${index + 1}. ${data.title}`;
-    const value = `スコア: ${data.score}\n[リベンジ](${data.url})`;
+  const fields = datas.slice(datas.length - 25).map(({ title, score, url }, index) => {
+    const name = `${index + 1}. ${title}`;
+    const value = `スコア: ${score}\n[リベンジ](${url})`;
     return { name, value };
   });
   const scoreMean = datas.reduce((pre, { score }) => pre + score, 0) / datas.length;
