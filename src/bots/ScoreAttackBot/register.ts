@@ -1,10 +1,20 @@
 import { Message } from 'discord.js';
+import { config } from 'dotenv';
 import { axios } from '.';
 import { ScoreAttackUsers } from '../../entity/ScoreAttackUsers';
 import { connect } from '../../utility';
 import { SparebeatProfile } from './types';
 
+config();
+const SPAREBEAT_GUILD_ID = process.env.SPAREBEAT_GUILD_ID as string;
+const REGISTER_CHANNEL_ID = process.env.REGISTER_CHANNEL_ID as string;
+
 const register = async (message: Message) => {
+  const guildId = message.guild?.id as string;
+  const channelId = message.channel.id;
+  if (guildId === SPAREBEAT_GUILD_ID && channelId !== REGISTER_CHANNEL_ID) {
+    return;
+  }
   const sparebeatName = message.content.split(' ')[1];
   const discordId = message.author.id;
   const mention = `<@!${discordId}>`;
