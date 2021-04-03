@@ -9,22 +9,14 @@ import {
 } from 'typeorm';
 
 @Entity()
-class ScoreAttackUsers {
+class ScoreAttackGroups {
   @PrimaryGeneratedColumn()
   // @ts-ignore
-  id: number;
+  groupId: number;
 
-  @Column({ type: 'varchar', length: 64 })
+  @Column({ type: 'varchar', length: 256 })
   // @ts-ignore
-  discordId: string;
-
-  @Column({ type: 'varchar', length: 64 })
-  // @ts-ignore
-  sparebeatName: string;
-
-  @Column({ type: 'integer', nullable: true, default: null })
-  // @ts-ignore
-  groupId: number | null;
+  groupName: string;
 
   @CreateDateColumn()
   // @ts-ignore
@@ -34,4 +26,4 @@ class ScoreAttackUsers {
   // @ts-ignore
   updatedAt: string;
 }
-export { ScoreAttackUsers };
+export { ScoreAttackGroups };
