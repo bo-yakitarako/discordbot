@@ -1,6 +1,18 @@
+import axiosBase from 'axios';
 import { Message, Collection, Role, GuildMember, Guild } from 'discord.js';
 import fetch from 'node-fetch';
 import { Bot } from './Bot';
+
+const axios = axiosBase.create({
+  baseURL: 'https://beta.sparebeat.com',
+  headers: {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    'Content-Type': 'application/json',
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    'X-Requested-With': 'XMLHttpRequest',
+  },
+  responseType: 'json',
+});
 
 type GradeId =
   | 'class5'
@@ -37,6 +49,15 @@ type Status = {
   [key in GradeId]: IResult;
 };
 
+type PlayAPI = {
+  track: {
+    title: string;
+    levelEasy: number;
+    levelNormal: number;
+    levelHard: number;
+  };
+};
+
 const gradeName: { [key in GradeId]: string } = {
   class5: '五級',
   class4: '四級',
@@ -66,6 +87,7 @@ class SparebeatGradeCertification extends Bot {
     if (message.author.bot) {
       return;
     }
+    SparebeatGradeCertification.showSongInfo(message);
     if (message.content === '!gradehelp') {
       this.showHelp(message);
     } else if (message.content === '!gradehelp link') {
@@ -222,6 +244,22 @@ class SparebeatGradeCertification extends Bot {
         .map((roleName) => `「**${roleName}**」`)
         .join('と')}の役職を作成しました！`,
     );
+  }
+
+  private static async showSongInfo(message: Message) {
+    const isURL = /^https:\/\/beta.sparebeat.com\/play\/[a-f0-9]{8}$/.test(message.content);
+    const isHash = /^[a-f0-9]{8}$/.test(message.content);
+    if (!isURL && !isHash) {
+      return;
+    }
+    const hash = isURL ? message.content.split('/').reverse()[0] : message.content;
+    try {
+      const { data } = await axios.get<PlayAPI>(`/api/play/${hash}`);
+      const { title, levelEasy, levelNormal, levelHard } = data.track;
+      message.channel.send(`${title}  ${levelEasy}/${levelNormal}/${levelHard}`);
+    } catch {
+      message.channel.send(`<@!${message.author.id}> 曲が見つからなかったよー`);
+    }
   }
 
   private showHelp(message: Message) {
