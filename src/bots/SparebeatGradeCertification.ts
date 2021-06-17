@@ -87,7 +87,7 @@ class SparebeatGradeCertification extends Bot {
     if (message.author.bot) {
       return;
     }
-    SparebeatGradeCertification.showSongInfo(message);
+    // SparebeatGradeCertification.showSongInfo(message);
     if (message.content === '!gradehelp') {
       this.showHelp(message);
     } else if (message.content === '!gradehelp link') {
@@ -246,6 +246,8 @@ class SparebeatGradeCertification extends Bot {
     );
   }
 
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   private static async showSongInfo(message: Message) {
     const isURL = /^https:\/\/beta.sparebeat.com\/play\/[a-f0-9]{8}$/.test(message.content);
     const isHash = /^[a-f0-9]{8}$/.test(message.content);
