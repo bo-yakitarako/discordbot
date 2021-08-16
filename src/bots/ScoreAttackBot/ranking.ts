@@ -33,7 +33,7 @@ const query = async (message: Message, beforeHour: number) =>
   connect(ScoreAttackHistories, (repository) =>
     repository
       .createQueryBuilder('histories')
-      .select('"discordId", SUM("score") as score')
+      .select('"discordId", ROUND(AVG("score"), 0) as score')
       .where(`"guildId" = '${(message.guild as Guild).id}'`)
       .andWhere(`NOW() - INTERVAL '${beforeHour} HOUR' < "createdAt"`)
       .groupBy('"discordId"')
