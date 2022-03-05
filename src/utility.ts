@@ -17,9 +17,11 @@ const isDevelopment = () => {
   return process.env.debug === 'true';
 };
 
+const connectionName = isDevelopment() ? 'development' : 'production';
+
 async function connect<Entity, Res>(entity: EntityTarget<Entity>, callback: Callback<Entity, Res>) {
-  const connection = await createConnection();
-  const repository = getRepository(entity);
+  const connection = await createConnection(connectionName);
+  const repository = getRepository(entity, connectionName);
   const responce = await callback(repository);
   connection.close();
   return responce;

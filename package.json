@@ -5,15 +5,14 @@
     "main": "index.js",
     "scripts": {
         "start": "node ./build/index.js",
-        "debug": "rm -rf ./build && yarn compile && node ./build/test.js",
+        "debug": "ts-node ./src/test.ts",
         "compile": "tsc -p .",
         "compile:test": "tsc -p . --noEmit",
-        "typeorm": "node --require ts-node/register ./node_modules/typeorm/cli.js",
         "typeorm:prod": "node ./node_modules/typeorm/cli.js",
-        "migration:generate": "rm -rf ./build && tsc && typeorm migration:generate -n",
-        "migration:run": "rm -rf ./build && tsc && typeorm migration:run",
-        "prod:migration-generate": "typeorm migration:generate -c production -n",
-        "prod:migration-run": "typeorm migration:run -c production"
+        "generate-migration": "ts-node node_modules/.bin/typeorm migration:generate -c development -n",
+        "migrate": "ts-node node_modules/.bin/typeorm migration:run -c development",
+        "prod:generate-migration": "typeorm migration:generate -c production -n",
+        "prod:migrate": "typeorm migration:run -c production"
     },
     "author": "bo-yakitarako",
     "license": "MIT",
