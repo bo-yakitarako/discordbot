@@ -67,7 +67,7 @@ class OmikujiBot extends BotBase {
       },
     });
     const isBoAlreadyDraw = await connect(BoResult, async (repository) => {
-      const { updatedAt } = (await repository.findOne({ id: 1 })) as BoResult;
+      const { updatedAt } = (await repository.findOne())!;
       return dayjs(updatedAt).format(DATE_FORMAT) === dayjs().format(DATE_FORMAT);
     });
     if (isBoAlreadyDraw) {

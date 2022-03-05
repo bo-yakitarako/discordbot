@@ -1,7 +1,7 @@
 import { config } from 'dotenv';
-import { SparebeatGradeCertification } from './bots/SparebeatGradeCertification';
+import { OmikujiBot } from './bots/OmikujiBot';
 
 config();
 const TEST_TOKEN = process.env.TEST_TOKEN as string;
-const test = new SparebeatGradeCertification();
+const test = new OmikujiBot();
 test.launch(TEST_TOKEN);
