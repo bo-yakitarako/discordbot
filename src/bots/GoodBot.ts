@@ -48,7 +48,7 @@ class GoodBot extends BotBase {
 
   private async getRate() {
     return connect(GoodRate, async (repository) => {
-      const { rate } = (await repository.findOne({ id: 1 })) as GoodRate;
+      const { rate } = (await repository.findOne()) as GoodRate;
       return rate;
     });
   }
@@ -65,7 +65,7 @@ class GoodBot extends BotBase {
           message.channel.send('0から100までの数字にしてほしいなー');
           return;
         }
-        const goodRate = (await repository.findOne({ id: 1 })) as GoodRate;
+        const goodRate = (await repository.findOne()) as GoodRate;
         goodRate.rate = rate / 100;
         await repository.save(goodRate);
         message.channel.send(`いいね確率を「${rate}%」にできていいね`);
