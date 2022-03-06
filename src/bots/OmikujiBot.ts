@@ -80,7 +80,7 @@ class OmikujiBot extends BotBase {
   }
 
   private async getBotComment(message: Message, fortune: OmikujiKey) {
-    const { result } = (await connect(BoResult, (repo) => repo.findOne({ id: 1 }))) as BoResult;
+    const { result } = (await connect(BoResult, (repo) => repo.findOne())) as BoResult;
     const mention = `<@!${message.author.id}>`;
     const victoryMessage = Math.random() < 0.5 ? 'つよい' : 'やるやん';
     const boIndex = omikujiKeys.indexOf(result);
